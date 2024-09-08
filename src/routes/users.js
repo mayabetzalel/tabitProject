@@ -21,17 +21,17 @@ userRoutes.get('/users', async (req, res) => {
     const users = await User.find().populate('books');
     res.json(users);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching users', error });
+    res.status(500).json({ message: 'Error get users', error });
   }
 });
 
 userRoutes.get('/users/:id', async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).populate('books');
+    const user = await User.findById(req.params.id)
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching user', error });
+    res.status(500).json({ message: 'Error get user by id', error });
   }
 });
 
@@ -63,7 +63,6 @@ userRoutes.post('/users/loan-book', async (req, res) => {
     await user.save();
     res.json(user);
   } catch (error) {
-    console.log(error)
     res.status(500).json({ message: 'Error adding book to user', error });
   }
 });
@@ -98,15 +97,12 @@ userRoutes.get('/users/availability/:bookId', async (req, res) => {
     try {
       const book = await Book.findById(req.params.bookId);
       if (!book) return res.status(404).json({ message: 'Book not found' });
-      console.log(book)
-
       if (book.isLoaned) {
         const availablenssDate = calcAvailablenss(book.loanDate, book.popularity)
         return res.json(`The book ${book.name} is not available, it will be at ${availablenssDate}`)
       } 
       return res.json(`The book ${book.name} is available`)
     } catch (error) {
-        console.log(error)
         res.status(500).json({ message: 'Error checking availability', error });
     }
 })
